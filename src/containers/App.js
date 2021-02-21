@@ -11,7 +11,7 @@ function App() {
 	const [categories, setCategories] = useState([])
 	const [category, setCategory] = useState('')
 	const [input, setInput] = useState('')
-	const [divVisible, setDivVisible] = useState( false )
+	const [divVisible, setDivVisible] = useState(false)
 
 	
 
@@ -19,20 +19,34 @@ function App() {
 		let categories = await fetch('https://api.chucknorris.io/jokes/categories')
 		categories = await categories.json()
 		setCategories(categories)
-		// document.addEventListener('click', (e)=>{
-		// 	if (document.getElementById('container')) {
-		// 		setDivVisible(true)
-		// 		let el = document.getElementById('container')
-		// 		if (e.target.id !== 'container') {
-		// 			el.style.display = 'none'
-		// 			setDivVisible(false)
-		// 		}
-		// 	}
-			
-			
-		// })
+		document.addEventListener('click', (e)=>{
+			console.log(e.target.tagName)
+			if (document.getElementById('content') && e.target.tagName !== 'BUTTON') {
+				let el = document.getElementById('content')
+				if (e.target.closest('#content')) {
+					console.log('inside of content')
+				} else {
+					setDivVisible(false)
+					el.style.display = 'none'
+				}
+			}
+		})
 	}, [])
+	useEffect(()=>{console.log(divVisible, fact)},[divVisible, fact])
+	useEffect(()=>{
+		if(fact !== null){
+			setDivVisible(true)
+		}
+	}, [fact])
 
+	const makeVisible = (divVisible) => {
+		const el = document.getElementById('content')
+		if(!divVisible) {
+			setDivVisible(true)
+			el.style.display = 'block'
+		}
+	}
+	
 	
 	const getRandom = async () => {
 		let fact = await fetch('https://api.chucknorris.io/jokes/random')
@@ -68,7 +82,7 @@ function App() {
 		<div className=" tc sans-serif contain bg-center" style={{ backgroundImage: `url(${Background})` }}>
 			<div className="bg-black-50 bg-black-80 vh-100  flex flex-column justify-between" >
 				<Header />
-				{ fact!==null ? <Cards fact={fact}/> : ''}
+				{ fact!==null ? <Cards makeVisible={makeVisible} divVisible={divVisible} fact={fact}/> : ''}
 				<Form
 					categories={categories}
 					getRandom={getRandom}
